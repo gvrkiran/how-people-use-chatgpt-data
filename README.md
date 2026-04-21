@@ -82,3 +82,11 @@ users  = pd.read_csv(f"user_demographics_{country}.csv")
 
 df = convos.merge(users, on="user_id")
 ```
+
+## Paper citation
+
+If you use this dataset, please cite:
+
+```
+How People Use ChatGPT: Conversation-Level Evidence from India, Nigeria, Brazil and Pakistan. by Shreyasi Roy Chowdhuri, Kiran Garimella. https://gvrkiran.github.io/content/How_people_use_ChatGPT.pdf
+```

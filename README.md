@@ -6,8 +6,8 @@ This repository contains ChatGPT conversation data with demographic information 
 
 For each country, two CSV files are provided:
 
-- `user_demographics_<Country>.csv` — one row per participant, containing basic demographic attributes.
-- `user_conversations_classified_<Country>.csv` — one row per conversation, containing conversation timestamp and classification labels along multiple dimensions.
+- `user_demographics_<Country>.csv` — one row per participant, containing basic demographic attributes and account-type.
+- `user_conversations_classified_<Country>.csv` — one row per conversation, containing conversation timestamp, classification labels, and per-conversation metadata (length, language, estimated time).
 
 | Country  | # Users | # Conversations |
 |----------|---------|-----------------|
@@ -20,12 +20,13 @@ Join key between the two files: `user_id`.
 
 ## Columns: `user_demographics_<Country>.csv`
 
-| Column    | Description                               |
-|-----------|-------------------------------------------|
-| `user_id` | Anonymous participant identifier.         |
-| `Age`     | Self-reported age (years).                |
-| `Gender`  | Self-reported gender.                     |
-| `Country` | Country of residence.                     |
+| Column    | Description                                                                    |
+|-----------|--------------------------------------------------------------------------------|
+| `user_id` | Anonymous participant identifier.                                              |
+| `Age`     | Self-reported age (years).                                                     |
+| `Gender`  | Self-reported gender.                                                          |
+| `Country` | Country of residence.                                                          |
+| `is_plus` | Boolean. `True` if the user held a ChatGPT Plus subscription, `False` otherwise. 
 
 ## Columns: `user_conversations_classified_<Country>.csv`
 
@@ -49,13 +50,16 @@ Derived by prompting `gpt-5-mini` with the conversation snippet and asking it to
 ### Anthropic economic primitives classification
 Derived by prompting `gpt-5-mini` with classifiers adapted from the Anthropic Economic Index, which characterise the context and complexity of the interaction rather than the topic.
 
-| Column                     | Description                                                                                                              |
-|----------------------------|--------------------------------------------------------------------------------------------------------------------------|
-| `work_coursework_personal` | Primary use case of the conversation. `Work` - professional use for tasks that are part of the user's job; `Coursework` - help the user complete coursework in educational contexts; `Personal` - any domain that is not work or coursework. |
-| `Complete_task_alone`      | `Yes` - the user could have completed the task without the Assistant (even if it would have taken longer); `No` - the user could not have completed the task without the Assistant. |
-| `Multitasking`             | `Yes` - the user worked on multiple tasks over the course of the conversation; `No` — the user worked on a single task throughout.                                                             |
-| `User_Education`           | Integer in `0–20`: the estimated years of formal education needed to understand the **user's prompts** in the conversation.                                                                    |
-| `AI_Education`             | Integer in `0–20`: the estimated years of formal education needed to understand the **Assistant's responses** in the conversation.                                                             |
+| Column                        | Description                                                                                                              |
+|-------------------------------|--------------------------------------------------------------------------------------------------------------------------|
+| `work_coursework_personal`    | Primary use case of the conversation. `Work` - professional use for tasks that are part of the user's job; `Coursework` - help the user complete coursework in educational contexts; `Personal` - any domain that is not work or coursework. |
+| `Complete_task_alone`         | `Yes` - the user could have completed the task without the Assistant (even if it would have taken longer); `No` - the user could not have completed the task without the Assistant. |
+| `Multitasking`                | `Yes` - the user worked on multiple tasks over the course of the conversation; `No` - the user worked on a single task throughout. |
+| `User_Education`              | Integer in `0–20`: the estimated years of formal education needed to understand the **user's prompts** in the conversation. |
+| `AI_Education`                | Integer in `0–20`: the estimated years of formal education needed to understand the **Assistant's responses** in the conversation. |
+| `success_label`               | `Yes` - the Assistant completed the task given by the user successfully; `No` - the Assistant did not complete the task successfully. |
+| `human_time_estimation`       | Integer. Estimated `hours` a skilled human would need to complete the task on their own, without the Assistant. 
+| `interaction_time_estimation` | Integer. Estimated `minutes` the user spent completing the task in the prompt with the help of Assistant. |
 
 ### Unsupervised clustering topics
 Conversations were embedded with `gemini-embedding-001` and clustered (PCA + KMeans) to discover country-specific topic clusters, which were then labeled and grouped into broader themes.
@@ -65,11 +69,23 @@ Conversations were embedded with `gemini-embedding-001` and clustered (PCA + KMe
 | `Clustering_Topic`        | Country-specific cluster label (e.g., `Online Earning`, `Mathematics`, `AI Image Generation`). |
 | `Clustering_Topic_Theme`  | Higher-level theme grouping the cluster labels.                                            |
 
+### Conversation metadata
+Additional per-conversation attributes derived directly from the raw conversation content.
+
+| Column                  | Description                                                                                                                                                 |
+|-------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `conversation_language` | ISO language code of the user's messages, detected with `langdetect` (e.g., `en`, `pt`, `hi`, `ur`). Special values: `too_short` if the concatenated user text is under 20 characters, `unknown` if detection failed. |
+| `n_turns`               | Number of user messages in the conversation.                                                                                                                |
+| `avg_user_text_len`     | Mean character length of the user's messages across the conversation.                                                                                       |
+| `avg_asst_text_len`     | Mean character length of the Assistant's responses across the conversation.                                                                                 |
+
 ## Notes on missing values
 
 - `Multitasking` and `Complete_task_alone` are `NaN` for conversations where the classifier could not confidently decide.
-- `asking_doing_expressing` / `work_coursework_personal` are `NaN` for a small number of conversations whose output did not match a valid label.
+- `asking_doing_expressing` / `work_coursework_personal` / `success_label` are `NaN` for a small number of conversations whose output did not match a valid label.
 - `Clustering_Topic` / `Clustering_Topic_Theme` are `NaN` for conversations outside the retained clusters (e.g., noise clusters dropped during labeling).
+- `human_time_estimation` / `interaction_time_estimation` are `NaN` for the handful of conversations where the classifier did not return a parseable integer.
+- `n_turns` / `avg_user_text_len` / `avg_asst_text_len` are `NaN` for conversations whose raw content could not be matched back in the user's export (e.g., deleted conversations).
 
 ## Loading example
 

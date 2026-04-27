@@ -74,10 +74,11 @@ Additional per-conversation attributes derived directly from the raw conversatio
 
 | Column                  | Description                                                                                                                                                 |
 |-------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `conversation_language` | ISO language code of the user's messages, detected with `langdetect` (e.g., `en`, `pt`, `hi`, `ur`). Special values: `too_short` if the concatenated user text is under 20 characters, `unknown` if detection failed. |
+| `conversation_language` | Language of the user's messages, detected with `langdetect` and collapsed to two values: `en` for English, `other` for any non-English language (including `too_short` and `unknown` cases). |
 | `n_turns`               | Number of user messages in the conversation.                                                                                                                |
 | `avg_user_text_len`     | Mean character length of the user's messages across the conversation.                                                                                       |
 | `avg_asst_text_len`     | Mean character length of the Assistant's responses across the conversation.                                                                                 |
+| `models_used`           | Semicolon-separated, sorted list of OpenAI model slugs that produced Assistant responses in the conversation (e.g., `gpt-4o`, `gpt-5`, `gpt-5-1`, `gpt-5-2`, `gpt-4o-mini`, `text-davinci-002-render-sha`). A conversation may include multiple models if the user switched mid-conversation (e.g., `gpt-4o;gpt-4o-mini`). Empty string if no model slug was recorded. |
 
 ## Notes on missing values
 
@@ -85,7 +86,7 @@ Additional per-conversation attributes derived directly from the raw conversatio
 - `asking_doing_expressing` / `work_coursework_personal` / `success_label` are `NaN` for a small number of conversations whose output did not match a valid label.
 - `Clustering_Topic` / `Clustering_Topic_Theme` are `NaN` for conversations outside the retained clusters (e.g., noise clusters dropped during labeling).
 - `human_time_estimation` / `interaction_time_estimation` are `NaN` for the handful of conversations where the classifier did not return a parseable integer.
-- `n_turns` / `avg_user_text_len` / `avg_asst_text_len` are `NaN` for conversations whose raw content could not be matched back in the user's export (e.g., deleted conversations).
+- `n_turns` / `avg_user_text_len` / `avg_asst_text_len` / `models_used` are `NaN` (or empty for `models_used`) for conversations whose raw content could not be matched back in the user's export (e.g., deleted conversations).
 
 ## Loading example
 

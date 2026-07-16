@@ -1,6 +1,6 @@
 # ChatGPT Conversation Data Across Four Countries
 
-This repository contains ChatGPT conversation data with demographic information collected from participants in four countries: **Brasil**, **India**, **Nigeria**, and **Pakistan**. Each conversation has been classified along several dimensions using LLM-based classifiers adapted from the [How People Use ChatGPT (OpenAI)](https://cdn.openai.com/pdf/a253471f-8260-40c6-a2cc-aa93fe9f142e/economic-research-chatgpt-usage-paper.pdf) and the [The Anthropic Economic Index report: Economic Primitives](https://www-cdn.anthropic.com/096d94c1a91c6480806d8f24b2344c7e2a4bc666.pdf).
+This repository contains ChatGPT conversation data with demographic information collected from participants in four countries: **Brazil**, **India**, **Nigeria**, and **Pakistan**. Each conversation has been classified along several dimensions using LLM-based classifiers adapted from the [How People Use ChatGPT (OpenAI)](https://cdn.openai.com/pdf/a253471f-8260-40c6-a2cc-aa93fe9f142e/economic-research-chatgpt-usage-paper.pdf) and the [The Anthropic Economic Index report: Economic Primitives](https://www-cdn.anthropic.com/096d94c1a91c6480806d8f24b2344c7e2a4bc666.pdf).
 
 ## Files
 
@@ -11,7 +11,7 @@ For each country, two CSV files are provided:
 
 | Country  | # Users | # Conversations |
 |----------|---------|-----------------|
-| Brasil   | 246     | 40,067          |
+| Brazil   | 246     | 40,067          |
 | India    | 557     | 88,958          |
 | Nigeria  | 243     | 44,114          |
 | Pakistan | 206     | 29,451          |
